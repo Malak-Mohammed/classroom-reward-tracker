@@ -2,24 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Classroom Reward Board</title>
   <style>
     * { box-sizing: border-box; }
+    
+    html {
+      height: -webkit-fill-available;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: #f0f4f8;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      height: 100vh;
+      justify-content: flex-start;
+      min-height: 100vh;
+      min-height: 100dvh;
       margin: 0;
-      padding: 15px 10px 15px 10px;
+      padding: 15px 10px 25px 10px;
       user-select: none;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto; /* Enables vertical scrolling whenever content exceeds screen height */
+      -webkit-overflow-scrolling: touch;
       position: relative;
     }
 
@@ -27,6 +35,8 @@
       color: #2c3e50;
       font-size: 1.3rem;
       margin: 5px 0 10px 0;
+      text-align: center;
+      flex-shrink: 0;
     }
 
     /* Vertical Board Container */
@@ -34,13 +44,15 @@
       display: flex;
       justify-content: space-around;
       width: 100%;
-      max-width: 450px;
-      flex-grow: 1;
+      max-width: 480px;
+      min-height: 420px; /* Guarantees layout height so dots do not squash */
       background: white;
-      padding: 10px;
+      padding: 12px 10px;
       border-radius: 20px;
       box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-      gap: 5px;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
     }
 
     .lane {
@@ -50,7 +62,7 @@
       justify-content: space-between;
       flex: 1;
       cursor: pointer;
-      padding: 5px;
+      padding: 6px 4px;
       border-radius: 12px;
       transition: background 0.2s;
     }
@@ -64,6 +76,7 @@
     .reward-top {
       font-size: 22px;
       margin-bottom: 4px;
+      flex-shrink: 0;
     }
 
     /* Vertical steps column */
@@ -74,7 +87,8 @@
       flex-grow: 1;
       width: 100%;
       align-items: center;
-      margin: 5px 0;
+      margin: 6px 0;
+      min-height: 280px;
     }
 
     .dot {
@@ -83,6 +97,7 @@
       border-radius: 50%;
       background-color: #e0e0e0;
       transition: background-color 0.2s ease;
+      flex-shrink: 0;
     }
 
     .dot.active {
@@ -95,6 +110,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .char-icon {
@@ -116,12 +132,12 @@
     /* Control Panel */
     .controls {
       width: 100%;
-      max-width: 450px;
+      max-width: 480px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 8px;
-      margin-top: 8px;
+      flex-shrink: 0;
     }
 
     .selected-info {
@@ -166,17 +182,18 @@
       color: #777; 
       box-shadow: none; 
       font-size: 0.75rem;
-      padding: 4px;
+      padding: 6px;
       border: 1px solid #ddd;
     }
 
-    /* Custom Centered Modal Pop-up Styling */
+    /* Centered Pretty Modal Overlay */
     .modal-overlay {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
       background: rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(3px);
       display: flex;
@@ -185,7 +202,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s ease;
-      z-index: 100;
+      z-index: 1000;
     }
 
     .modal-overlay.active {
@@ -209,29 +226,10 @@
       transform: scale(1);
     }
 
-    .modal-icon {
-      font-size: 42px;
-      margin-bottom: 8px;
-    }
-
-    .modal-title {
-      font-size: 1.15rem;
-      font-weight: bold;
-      color: #2c3e50;
-      margin-bottom: 8px;
-    }
-
-    .modal-message {
-      font-size: 0.95rem;
-      color: #666;
-      margin-bottom: 20px;
-      line-height: 1.4;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-    }
+    .modal-icon { font-size: 42px; margin-bottom: 8px; }
+    .modal-title { font-size: 1.15rem; font-weight: bold; color: #2c3e50; margin-bottom: 8px; }
+    .modal-message { font-size: 0.95rem; color: #666; margin-bottom: 20px; line-height: 1.4; }
+    .modal-actions { display: flex; gap: 10px; }
 
     .modal-btn {
       flex: 1;
@@ -244,6 +242,23 @@
     .modal-btn-primary { background: #2ec4b6; color: white; }
     .modal-btn-secondary { background: #e0e0e0; color: #555; }
     .modal-btn-danger { background: #e74c3c; color: white; }
+
+    /* LANDSCAPE SUPPORT: Spacing adjustments when rotated sideways */
+    @media (min-aspect-ratio: 1/1) {
+      body {
+        padding: 10px;
+      }
+      .board-container {
+        max-width: 520px;
+        min-height: 380px;
+      }
+      .steps-column {
+        min-height: 240px;
+      }
+      .controls {
+        max-width: 520px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -267,12 +282,12 @@
     </div>
   </div>
 
-  <!-- Centered Pretty Modal Overlay -->
+  <!-- Centered Modal Overlay -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal-card">
       <div class="modal-icon" id="modalIcon">🎉</div>
       <div class="modal-title" id="modalTitle">Title</div>
-      <div class="modal-message" id="modalMessage">Message body text goes here.</div>
+      <div class="modal-message" id="modalMessage">Message</div>
       <div class="modal-actions" id="modalActions"></div>
     </div>
   </div>
@@ -444,7 +459,6 @@
       document.getElementById('modalOverlay').classList.remove('active');
     }
 
-    // Initial render
     renderBoard();
   </script>
 </body>
