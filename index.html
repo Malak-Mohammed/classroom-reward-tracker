@@ -26,16 +26,89 @@
       padding: 15px 10px 25px 10px;
       user-select: none;
       overflow-x: hidden;
-      overflow-y: auto; /* Enables vertical scrolling whenever content exceeds screen height */
+      overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       position: relative;
     }
 
+    /* Top Navigation / Title Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 10px;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .title-section {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
     h1 {
       color: #2c3e50;
-      font-size: 1.3rem;
-      margin: 5px 0 10px 0;
-      text-align: center;
+      font-size: 1.2rem;
+      margin: 0 0 4px 0;
+      text-align: left;
+    }
+
+    /* Rules Box at Top Right */
+    .rules-box {
+      background: #ffffff;
+      border: 1px solid #e1e8ed;
+      border-left: 4px solid #2ec4b6;
+      border-radius: 12px;
+      padding: 8px 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      max-width: 210px;
+      flex-shrink: 0;
+    }
+
+    .rules-title {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #2c3e50;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .rules-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .rules-list li {
+      font-size: 0.7rem;
+      color: #4a5568;
+      line-height: 1.35;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .rules-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .rules-badge {
+      background: #e8f4fd;
+      color: #2ec4b6;
+      font-weight: bold;
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-size: 0.65rem;
+      white-space: nowrap;
       flex-shrink: 0;
     }
 
@@ -45,7 +118,7 @@
       justify-content: space-around;
       width: 100%;
       max-width: 480px;
-      min-height: 420px; /* Guarantees layout height so dots do not squash */
+      min-height: 420px;
       background: white;
       padding: 12px 10px;
       border-radius: 20px;
@@ -72,17 +145,15 @@
       border: 2px solid #2ec4b6;
     }
 
-    /* Reward top item */
     .reward-top {
       font-size: 22px;
       margin-bottom: 4px;
       flex-shrink: 0;
     }
 
-    /* Vertical steps column */
     .steps-column {
       display: flex;
-      flex-direction: column-reverse; /* Step 1 at bottom, 20 at top */
+      flex-direction: column-reverse;
       justify-content: space-between;
       flex-grow: 1;
       width: 100%;
@@ -105,7 +176,6 @@
       box-shadow: 0 0 4px #4caf50;
     }
 
-    /* Character & Student Label */
     .character-bottom {
       display: flex;
       flex-direction: column;
@@ -243,10 +313,10 @@
     .modal-btn-secondary { background: #e0e0e0; color: #555; }
     .modal-btn-danger { background: #e74c3c; color: white; }
 
-    /* LANDSCAPE SUPPORT: Spacing adjustments when rotated sideways */
+    /* Landscape Adjustments */
     @media (min-aspect-ratio: 1/1) {
-      body {
-        padding: 10px;
+      .top-bar {
+        max-width: 520px;
       }
       .board-container {
         max-width: 520px;
@@ -263,7 +333,20 @@
 </head>
 <body>
 
-  <h1>🏆 Class Reward Race 🏆</h1>
+  <!-- Top Bar with Title and Top-Right Rules Box -->
+  <div class="top-bar">
+    <div class="title-section">
+      <h1>🏆 Class Reward Race</h1>
+    </div>
+
+    <!-- Rules / Action Box -->
+    <div class="rules-box">
+      <div class="rules-title">📌 Class Rules</div>
+      <ul class="rules-list" id="rulesList">
+        <!-- Rendered dynamically from script -->
+      </ul>
+    </div>
+  </div>
 
   <!-- 5 Student Lanes -->
   <div class="board-container" id="board"></div>
@@ -295,6 +378,14 @@
   <script>
     const totalSteps = 20;
 
+    // Rules displayed in the top-right box (you can edit or add rules here)
+    const classroomRules = [
+      { badge: "+1 Step", text: "follow classroom rules 🤫" },
+      { badge: "+2 Steps", text: "help a friend 👯" },
+      { badge: "+3 Step", text: "answer the question 🙋🏻‍♀️" }
+      
+    ];
+
     const students = [
       { id: 0, name: "Student 1", icon: "🐱", reward: "🏆" },
       { id: 1, name: "Student 2", icon: "🐶", reward: "🏆" },
@@ -305,6 +396,16 @@
 
     let selectedIndex = 0;
     let progress = JSON.parse(localStorage.getItem('studentProgress')) || [0, 0, 0, 0, 0];
+
+    function renderRules() {
+      const rulesContainer = document.getElementById('rulesList');
+      rulesContainer.innerHTML = '';
+      classroomRules.forEach(rule => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="rules-badge">${rule.badge}</span> <span>${rule.text}</span>`;
+        rulesContainer.appendChild(li);
+      });
+    }
 
     function renderBoard() {
       const boardElement = document.getElementById('board');
@@ -459,6 +560,8 @@
       document.getElementById('modalOverlay').classList.remove('active');
     }
 
+    // Initialize Page
+    renderRules();
     renderBoard();
   </script>
 </body>
