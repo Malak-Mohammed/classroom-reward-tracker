@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -16,11 +16,13 @@
     
     html, body {
       width: 100%;
-      height: 100vh;
-      height: 100dvh;
+      height: 100%;
+      height: -webkit-fill-available;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     /* Hide scrollbars globally */
@@ -38,7 +40,10 @@
       background: url('background.jpeg') center center / cover no-repeat #8ee4af;
       display: flex;
       flex-direction: column;
-      padding: env(safe-area-inset-top, 6px) env(safe-area-inset-right, 8px) env(safe-area-inset-bottom, 8px) env(safe-area-inset-left, 8px);
+      padding-top: max(6px, env(safe-area-inset-top));
+      padding-right: max(8px, env(safe-area-inset-right));
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
+      padding-left: max(8px, env(safe-area-inset-left));
       gap: 6px;
       position: relative;
     }
@@ -81,24 +86,25 @@
     /* Main Layout Wrapper */
     .main-wrapper {
       display: flex;
-      flex: 1 1 auto;
+      flex: 1;
       width: 100%;
-      gap: 12px;
+      gap: 8px;
       min-height: 0;
       align-items: stretch;
+      overflow: hidden;
     }
 
-    /* Garden Board Container */
+    /* Garden Board Container - Allows Vertical Scroll for 8 Characters */
     .garden-board {
       display: flex;
       flex-direction: column;
       flex: 1;
       background: transparent;
-      padding: 20px 10px;
+      padding: 6px 2px;
       min-height: 0;
-      gap: 48px;
-      overflow-x: auto;
+      gap: 12px;
       overflow-y: auto;
+      overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
     }
 
@@ -107,11 +113,10 @@
       display: flex;
       align-items: center;
       width: 100%;
-      min-width: 750px;
-      height: 120px;
+      height: 90px;
       flex-shrink: 0;
-      gap: 20px;
-      padding: 10px;
+      gap: 6px;
+      padding: 4px;
       border-radius: 14px;
       background: transparent;
       transition: all 0.2s ease;
@@ -123,9 +128,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      width: 140px; 
-      min-width: 140px;
-      max-width: 140px;
+      width: clamp(65px, 9vw, 95px);
       flex-shrink: 0;
       cursor: pointer;
       padding: 2px;
@@ -143,13 +146,14 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      flex-grow: 1;
-      height: clamp(85px, 12vh, 135px);
+      flex: 1 1 auto;
+      height: 100%;
       background: transparent;
       border-radius: 16px;
-      padding: 0 6px;
+      padding: 0 2px;
       position: relative;
-      gap: clamp(2px, 0.6vw, 8px);
+      gap: 0;
+      min-width: 0;
     }
 
     /* Individual Step Dots Container */
@@ -158,16 +162,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: clamp(14px, 2vw, 28px);
-      height: clamp(14px, 2vw, 28px);
-      flex-shrink: 0;
+      flex: 1;
+      height: 100%;
+      min-width: 0;
     }
 
     /* Jump 0 Wrapper on the Left */
     .start-wrapper {
       position: relative;
-      width: clamp(14px, 2vw, 28px);
-      height: clamp(14px, 2vw, 28px);
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -175,20 +179,20 @@
 
     /* Step Dots */
     .dot {
-      width: clamp(10px, 1.5vw, 20px);
-      height: clamp(10px, 1.5vw, 20px);
+      width: clamp(6px, 1.1vw, 14px);
+      height: clamp(6px, 1.1vw, 14px);
       border-radius: 50%;
       background-color: rgba(255, 255, 255, 0.85);
-      border: 1.5px solid rgba(0, 0, 0, 0.25);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      border: 1px solid rgba(0, 0, 0, 0.25);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
       transition: background-color 0.2s ease, transform 0.2s, box-shadow 0.2s;
       flex-shrink: 0;
     }
 
     .dot.active {
       background-color: #ff9f1c;
-      box-shadow: 0 0 8px rgba(255, 159, 28, 1);
-      border: 1.5px solid #ffffff;
+      box-shadow: 0 0 6px rgba(255, 159, 28, 1);
+      border: 1px solid #ffffff;
       transform: scale(1.15);
     }
 
@@ -206,8 +210,8 @@
 
     /* Standardized Face Image Styling */
     .character-avatar {
-      width: clamp(100px, 15vw, 150px);
-      height: clamp(100px, 15vw, 150px);
+      width: clamp(65px, 9vw, 95px);
+      height: clamp(65px, 9vw, 95px);
       object-fit: contain;
       background-color: transparent;
       border: none;
@@ -217,7 +221,7 @@
     }
 
     .jumping-bunny.selected .character-avatar {
-      filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.95)) drop-shadow(0 6px 12px rgba(0,0,0,0.45));
+      filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.95)) drop-shadow(0 4px 8px rgba(0,0,0,0.45));
       transform: scale(1.08);
     }
 
@@ -228,31 +232,31 @@
 
     @keyframes bunnyHop {
       0% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-30px) scale(1.2) rotate(-8deg); }
+      50% { transform: translateY(-20px) scale(1.2) rotate(-8deg); }
       100% { transform: translateY(0) scale(1); }
     }
 
     /* Right End Gift Target */
     .gift-end {
-      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-size: clamp(1.4rem, 2.8vw, 2.2rem);
       line-height: 1;
       flex-shrink: 0;
-      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
-      padding-left: 6px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      padding-left: 2px;
     }
 
     /* Transparent Side Control Panel */
     .controls-side {
-      width: clamp(140px, 18vw, 200px);
+      width: clamp(90px, 12vw, 130px);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 16px;
+      gap: 8px;
       flex-shrink: 0;
       z-index: 2;
       background: transparent;
-      padding: 10px;
+      padding: 4px;
     }
 
     /* Vertical Action Circular Button Group */
@@ -261,22 +265,22 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 14px;
+      gap: 8px;
       width: 100%;
     }
 
-    /* Big Circular Action Buttons */
+    /* Circular Action Buttons */
     .btn-action {
-      width: clamp(65px, 9vw, 95px);
-      height: clamp(65px, 9vw, 95px);
+      width: clamp(42px, 5.5vw, 65px);
+      height: clamp(42px, 5.5vw, 65px);
       border-radius: 50%;
-      font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+      font-size: clamp(1rem, 1.6vw, 1.4rem);
       font-weight: 900;
-      border: 2px solid rgba(255, 255, 255, 0.6);
+      border: none;
       cursor: pointer;
       color: white;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-      transition: transform 0.15s, filter 0.15s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      transition: transform 0.1s, filter 0.1s;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -294,39 +298,37 @@
     
     .btn-angry {
       background: transparent;
-      border: none;
       box-shadow: none;
       padding: 0;
-      overflow: visible;
     }
 
     .btn-angry-img {
-      width: 115%;
-      height: 115%;
+      width: 120%;
+      height: 120%;
       object-fit: contain;
       display: block;
-      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
     }
 
     /* Transparent Reset Bar */
     .reset-bar {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
       width: 100%;
-      margin-top: 4px;
+      margin-top: 2px;
       align-items: center;
     }
 
     .btn-reset { 
-      width: 85%;
+      width: 100%;
       background-color: rgba(255, 255, 255, 0.85); 
       color: #333; 
       font-weight: 700;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15); 
-      font-size: clamp(0.7rem, 0.85vw, 0.8rem);
-      padding: 6px 8px;
-      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
+      font-size: clamp(0.55rem, 0.7vw, 0.65rem);
+      padding: 4px 2px;
+      border-radius: 6px;
       border: 1px solid rgba(255, 255, 255, 0.9);
       cursor: pointer;
       text-align: center;
@@ -362,9 +364,9 @@
     .modal-card {
       background: rgba(255, 255, 255, 0.95);
       width: 90%;
-      max-width: 360px;
-      padding: 24px 20px;
-      border-radius: 28px;
+      max-width: 340px;
+      padding: 20px 16px;
+      border-radius: 24px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.3);
       display: flex;
       flex-direction: column;
@@ -379,31 +381,31 @@
     }
 
     .big-gift-icon {
-      font-size: clamp(75px, 14vw, 110px);
+      font-size: clamp(60px, 12vw, 90px);
       line-height: 1;
-      margin-bottom: -10px;
+      margin-bottom: -6px;
       filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
       animation: floatGift 2s infinite ease-in-out;
     }
 
     @keyframes floatGift {
       0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-10px) rotate(4deg); }
+      50% { transform: translateY(-8px) rotate(4deg); }
     }
 
     .big-winner-face {
-      width: clamp(140px, 26vw, 210px);
-      height: clamp(140px, 26vw, 210px);
+      width: clamp(110px, 20vw, 160px);
+      height: clamp(110px, 20vw, 160px);
       object-fit: contain;
-      margin: 10px 0 20px 0;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.25));
+      margin: 8px 0 16px 0;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
     }
 
     .btn-again {
       width: auto;
-      min-width: 110px;
-      padding: 8px 20px;
-      font-size: 0.9rem;
+      min-width: 100px;
+      padding: 8px 18px;
+      font-size: 0.85rem;
       font-weight: 800;
       background: #2ec4b6;
       color: white;
@@ -420,12 +422,12 @@
     }
 
     .confirm-card {
-      padding: 20px 16px;
+      padding: 18px 14px;
       text-align: center;
     }
 
-    .confirm-title { font-size: 1.1rem; font-weight: 800; color: #2c3e50; margin-bottom: 6px; }
-    .confirm-message { font-size: 0.85rem; color: #555; margin-bottom: 16px; line-height: 1.3; }
+    .confirm-title { font-size: 1rem; font-weight: 800; color: #2c3e50; margin-bottom: 4px; }
+    .confirm-message { font-size: 0.8rem; color: #555; margin-bottom: 14px; line-height: 1.3; }
     .confirm-actions { display: flex; gap: 8px; width: 100%; }
 
     .modal-btn {
@@ -433,7 +435,7 @@
       padding: 8px;
       border-radius: 8px;
       border: none;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: bold;
       cursor: pointer;
     }
@@ -443,11 +445,10 @@
 
     @media (max-width: 600px) and (orientation: portrait) {
       .main-wrapper { flex-direction: column; }
-      .lane-row { min-width: 100%; }
       .controls-side {
         width: 100%;
         flex-direction: column;
-        padding: 8px 12px;
+        padding: 4px 8px;
       }
       .btn-group { 
         flex-direction: row; 
@@ -457,7 +458,7 @@
       .reset-bar { 
         flex-direction: row;
         width: 100%; 
-        margin-top: 4px; 
+        margin-top: 2px; 
       }
     }
   </style>
@@ -504,7 +505,14 @@
   <script>
     const totalSteps = 20;
 
-    // Audio Files Configuration matching Grade 1 setup
+    // Set viewport height dynamically to handle iOS Safari bounds
+    function setViewportHeight() {
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    }
+    setViewportHeight();
+    window.addEventListener('resize', setViewportHeight);
+
+    // Audio Files Configuration
     const jumpSound = new Audio('jump.mp3');
     const backSound = new Audio('back.mp3');
 
