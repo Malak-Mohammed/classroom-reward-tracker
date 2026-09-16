@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -16,19 +16,24 @@
     
     html, body {
       width: 100%;
-      height: 100vh;
-      height: 100dvh;
+      height: 100%;
+      height: -webkit-fill-available;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     body {
       background: url('background.jpeg') center center / cover no-repeat #8ee4af;
       display: flex;
       flex-direction: column;
-      padding: env(safe-area-inset-top, 6px) env(safe-area-inset-right, 8px) env(safe-area-inset-bottom, 8px) env(safe-area-inset-left, 8px);
-      gap: 6px;
+      padding-top: max(6px, env(safe-area-inset-top));
+      padding-right: max(8px, env(safe-area-inset-right));
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
+      padding-left: max(8px, env(safe-area-inset-left));
+      gap: 4px;
       position: relative;
     }
 
@@ -56,7 +61,7 @@
 
     .title-section h1 {
       color: #1e4620;
-      font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+      font-size: clamp(1rem, 2vw, 1.4rem);
       font-weight: 900;
       text-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
       display: flex;
@@ -70,26 +75,25 @@
     /* Main Layout Wrapper */
     .main-wrapper {
       display: flex;
-      flex: 1 1 auto;
+      flex: 1 1 0%;
       width: 100%;
-      gap: 8px;
+      gap: 6px;
       min-height: 0;
       align-items: stretch;
+      overflow: hidden;
     }
 
     /* Garden Board Container */
     .garden-board {
       display: flex;
       flex-direction: column;
-      justify-content: space-around;
+      justify-content: space-evenly;
       flex: 1;
       background: transparent;
       padding: 2px 0;
       min-height: 0;
-      gap: 4px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      -webkit-overflow-scrolling: touch;
+      gap: 2px;
+      overflow: hidden;
     }
 
     /* Horizontal Lane Row */
@@ -97,14 +101,14 @@
       display: flex;
       align-items: center;
       width: 100%;
-      min-width: 650px;
       flex: 1;
-      gap: 8px;
-      padding: 4px 6px;
+      gap: 4px;
+      padding: 2px 4px;
       border-radius: 14px;
       background: transparent;
       border: 2px solid transparent;
       transition: all 0.2s ease;
+      min-height: 0;
     }
 
     /* Character Profile Left Box */
@@ -113,7 +117,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      width: clamp(90px, 14vw, 150px);
+      width: clamp(55px, 8vw, 90px);
       flex-shrink: 0;
       cursor: pointer;
       padding: 2px;
@@ -122,7 +126,7 @@
     }
 
     .character-left.slightly-larger-left {
-      width: clamp(110px, 17vw, 180px);
+      width: clamp(65px, 10vw, 105px);
     }
 
     .character-left:hover {
@@ -135,17 +139,15 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      flex-grow: 1;
-      height: clamp(80px, 11vh, 130px);
+      flex: 1 1 auto;
+      height: 100%;
+      max-height: clamp(60px, 12vh, 100px);
       background: transparent;
       border-radius: 16px;
-      padding: 0 6px;
+      padding: 0 2px;
       position: relative;
-      gap: clamp(2px, 0.6vw, 8px);
-    }
-
-    .steps-row.slightly-larger-row {
-      height: clamp(95px, 13vh, 150px);
+      gap: 0;
+      min-width: 0;
     }
 
     /* Individual Step Dots Container */
@@ -154,16 +156,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: clamp(14px, 2vw, 28px);
-      height: clamp(14px, 2vw, 28px);
-      flex-shrink: 0;
+      flex: 1;
+      height: 100%;
+      min-width: 0;
     }
 
     /* Jump 0 Wrapper on the Left */
     .start-wrapper {
       position: relative;
-      width: clamp(14px, 2vw, 28px);
-      height: clamp(14px, 2vw, 28px);
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -171,20 +173,20 @@
 
     /* Step Dots */
     .dot {
-      width: clamp(10px, 1.5vw, 20px);
-      height: clamp(10px, 1.5vw, 20px);
+      width: clamp(6px, 1.1vw, 14px);
+      height: clamp(6px, 1.1vw, 14px);
       border-radius: 50%;
       background-color: rgba(255, 255, 255, 0.85);
-      border: 1.5px solid rgba(0, 0, 0, 0.25);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      border: 1px solid rgba(0, 0, 0, 0.25);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
       transition: background-color 0.2s ease, transform 0.2s, box-shadow 0.2s;
       flex-shrink: 0;
     }
 
     .dot.active {
       background-color: #ff9f1c;
-      box-shadow: 0 0 8px rgba(255, 159, 28, 1);
-      border: 1.5px solid #ffffff;
+      box-shadow: 0 0 6px rgba(255, 159, 28, 1);
+      border: 1px solid #ffffff;
       transform: scale(1.15);
     }
 
@@ -202,25 +204,25 @@
 
     /* Base Face Image Styling */
     .character-avatar {
-      width: clamp(90px, 14vw, 150px);
-      height: clamp(90px, 14vw, 150px);
+      width: clamp(55px, 8vw, 90px);
+      height: clamp(55px, 8vw, 90px);
       object-fit: contain;
       background-color: transparent;
       border: none;
       box-shadow: none;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
       transition: filter 0.2s ease, transform 0.2s ease;
     }
 
-    /* 3RD FACE SLIGHTLY LARGER (~20% larger than base) */
+    /* 3RD FACE SLIGHTLY LARGER */
     .character-avatar.slightly-larger {
-      width: clamp(110px, 17vw, 180px);
-      height: clamp(110px, 17vw, 180px);
-      filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.4));
+      width: clamp(65px, 10vw, 105px);
+      height: clamp(65px, 10vw, 105px);
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
     }
 
     .jumping-bunny.selected .character-avatar {
-      filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.95)) drop-shadow(0 6px 12px rgba(0,0,0,0.45));
+      filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.95)) drop-shadow(0 4px 8px rgba(0,0,0,0.45));
       transform: scale(1.08);
     }
 
@@ -231,31 +233,31 @@
 
     @keyframes bunnyHop {
       0% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-30px) scale(1.2) rotate(-8deg); }
+      50% { transform: translateY(-20px) scale(1.2) rotate(-8deg); }
       100% { transform: translateY(0) scale(1); }
     }
 
     /* Right End Gift Target */
     .gift-end {
-      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-size: clamp(1.4rem, 2.8vw, 2.2rem);
       line-height: 1;
       flex-shrink: 0;
-      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
       padding-left: 2px;
     }
 
     /* Side Control Panel - Fully Transparent */
     .controls-side {
-      width: clamp(140px, 18vw, 200px);
+      width: clamp(90px, 12vw, 130px);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       flex-shrink: 0;
       z-index: 2;
       background: transparent;
-      padding: 10px;
+      padding: 4px;
       border-radius: 0;
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
@@ -267,22 +269,22 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       width: 100%;
     }
 
     /* CIRCULAR Action Buttons */
     .btn-action {
-      width: clamp(60px, 7.5vw, 85px);
-      height: clamp(60px, 7.5vw, 85px);
+      width: clamp(42px, 5.5vw, 65px);
+      height: clamp(42px, 5.5vw, 65px);
       border-radius: 50%;
-      font-size: clamp(1.4rem, 2.2vw, 2rem);
+      font-size: clamp(1rem, 1.6vw, 1.4rem);
       font-weight: 900;
       padding: 0;
       border: none;
       cursor: pointer;
       color: white;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
       transition: transform 0.1s, filter 0.1s;
       display: flex;
       align-items: center;
@@ -322,9 +324,9 @@
     .reset-bar {
       display: flex;
       flex-direction: row;
-      gap: 6px;
+      gap: 4px;
       width: 100%;
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     .btn-reset { 
@@ -332,10 +334,10 @@
       background-color: rgba(255, 255, 255, 0.85); 
       color: #333; 
       font-weight: 700;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.15); 
-      font-size: clamp(0.65rem, 0.8vw, 0.75rem);
-      padding: 6px 4px;
-      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
+      font-size: clamp(0.55rem, 0.7vw, 0.65rem);
+      padding: 4px 2px;
+      border-radius: 6px;
       border: 1px solid rgba(255, 255, 255, 0.9);
       cursor: pointer;
       text-align: center;
@@ -371,9 +373,9 @@
     .modal-card {
       background: rgba(255, 255, 255, 0.95);
       width: 90%;
-      max-width: 360px;
-      padding: 24px 20px;
-      border-radius: 28px;
+      max-width: 340px;
+      padding: 20px 16px;
+      border-radius: 24px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.3);
       display: flex;
       flex-direction: column;
@@ -387,35 +389,32 @@
       transform: scale(1);
     }
 
-    /* Big Gift Styling */
     .big-gift-icon {
-      font-size: clamp(75px, 14vw, 110px);
+      font-size: clamp(60px, 12vw, 90px);
       line-height: 1;
-      margin-bottom: -10px;
+      margin-bottom: -6px;
       filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
       animation: floatGift 2s infinite ease-in-out;
     }
 
     @keyframes floatGift {
       0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-10px) rotate(4deg); }
+      50% { transform: translateY(-8px) rotate(4deg); }
     }
 
-    /* Big Face Styling */
     .big-winner-face {
-      width: clamp(140px, 26vw, 210px);
-      height: clamp(140px, 26vw, 210px);
+      width: clamp(110px, 20vw, 160px);
+      height: clamp(110px, 20vw, 160px);
       object-fit: contain;
-      margin: 10px 0 20px 0;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.25));
+      margin: 8px 0 16px 0;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
     }
 
-    /* Small "Again" Button */
     .btn-again {
       width: auto;
-      min-width: 110px;
-      padding: 8px 20px;
-      font-size: 0.9rem;
+      min-width: 100px;
+      padding: 8px 18px;
+      font-size: 0.85rem;
       font-weight: 800;
       background: #2ec4b6;
       color: white;
@@ -431,14 +430,13 @@
       width: 100%;
     }
 
-    /* Confirmation Modals for Reset Buttons */
     .confirm-card {
-      padding: 20px 16px;
+      padding: 18px 14px;
       text-align: center;
     }
 
-    .confirm-title { font-size: 1.1rem; font-weight: 800; color: #2c3e50; margin-bottom: 6px; }
-    .confirm-message { font-size: 0.85rem; color: #555; margin-bottom: 16px; line-height: 1.3; }
+    .confirm-title { font-size: 1rem; font-weight: 800; color: #2c3e50; margin-bottom: 4px; }
+    .confirm-message { font-size: 0.8rem; color: #555; margin-bottom: 14px; line-height: 1.3; }
     .confirm-actions { display: flex; gap: 8px; width: 100%; }
 
     .modal-btn {
@@ -446,7 +444,7 @@
       padding: 8px;
       border-radius: 8px;
       border: none;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: bold;
       cursor: pointer;
     }
@@ -460,14 +458,10 @@
         flex-direction: column;
       }
 
-      .lane-row {
-        min-width: 100%;
-      }
-
       .controls-side {
         width: 100%;
         flex-direction: column;
-        padding: 8px 12px;
+        padding: 4px 8px;
       }
 
       .btn-group {
@@ -526,6 +520,13 @@
   <script>
     const totalSteps = 20;
 
+    // Fix iOS height calculation on load and resize
+    function setViewportHeight() {
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    }
+    setViewportHeight();
+    window.addEventListener('resize', setViewportHeight);
+
     // AUDIO SYSTEM
     let audioCtx = null;
 
@@ -556,7 +557,6 @@
         const now = audioCtx.currentTime;
 
         if (type === 'jump') {
-          // Grade 1 Jump Sound
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
           osc.type = 'sine';
@@ -595,7 +595,6 @@
         const laneRow = document.createElement('div');
         laneRow.className = `lane-row ${selectedIndex === index ? 'selected' : ''}`;
 
-        // Left Container for Jump 0
         const charLeft = document.createElement('div');
         charLeft.className = `character-left ${isThirdFace ? 'slightly-larger-left' : ''}`;
         charLeft.onclick = () => selectStudent(index);
@@ -605,11 +604,9 @@
 
         charLeft.appendChild(startDotWrapper);
 
-        // Horizontal Step Dots Path Container
         const stepsRow = document.createElement('div');
         stepsRow.className = `steps-row ${isThirdFace ? 'slightly-larger-row' : ''}`;
 
-        // Jumps 1 to 20 Dot Wrappers
         for (let i = 1; i <= totalSteps; i++) {
           const dotWrapper = document.createElement('div');
           dotWrapper.className = 'dot-wrapper';
@@ -622,12 +619,10 @@
           stepsRow.appendChild(dotWrapper);
         }
 
-        // Create & position the Jumping Character Photo
         const bunny = document.createElement('div');
         const isSelected = selectedIndex === index;
         bunny.className = `jumping-bunny ${isSelected ? 'selected' : ''} ${animateHopIndex === index ? 'hop' : ''}`;
         
-        // Face Image Element
         const img = document.createElement('img');
         img.src = student.icon;
         img.alt = student.name;
@@ -639,7 +634,6 @@
           selectStudent(index);
         };
 
-        // Attach character badge to jump 0 (left slot) or jump 1-20 dots
         const currentStepIndex = progress[index];
         if (currentStepIndex === 0) {
           startDotWrapper.appendChild(bunny);
@@ -648,7 +642,6 @@
           targetWrapper.appendChild(bunny);
         }
 
-        // Target Gift Icon on Right End
         const giftEnd = document.createElement('div');
         giftEnd.className = 'gift-end';
         giftEnd.innerText = progress[index] === totalSteps ? '🎁✨' : '🎁';
@@ -674,17 +667,14 @@
         progress[selectedIndex] = newVal;
         localStorage.setItem('studentProgress_g2', JSON.stringify(progress));
 
-        // Play Movement Sound Effect
         if (val < 0) {
           playSound('back');
         } else {
           playSound('jump');
         }
 
-        // Trigger hop animation on movement
         renderBoard(selectedIndex);
 
-        // Play win.mp3 and show modal on reaching step 20
         if (newVal === totalSteps) {
           setTimeout(() => {
             playSound('win');
@@ -719,7 +709,7 @@
       const card = document.getElementById('modalCard');
       card.className = "modal-card confirm-card";
       card.innerHTML = `
-        <div style="font-size:32px; margin-bottom:4px;">🔄</div>
+        <div style="font-size:28px; margin-bottom:4px;">🔄</div>
         <div class="confirm-title">Reset Face?</div>
         <div class="confirm-message">Reset <b>${current.name}</b> back to Jump 0?</div>
         <div class="confirm-actions">
@@ -741,7 +731,7 @@
       const card = document.getElementById('modalCard');
       card.className = "modal-card confirm-card";
       card.innerHTML = `
-        <div style="font-size:32px; margin-bottom:4px;">⚠️</div>
+        <div style="font-size:28px; margin-bottom:4px;">⚠️</div>
         <div class="confirm-title">Reset All Faces?</div>
         <div class="confirm-message">Are you sure you want to reset <b>ALL</b> characters back to Jump 0?</div>
         <div class="confirm-actions">
