@@ -528,16 +528,8 @@
     window.addEventListener('resize', setViewportHeight);
 
     // AUDIO SYSTEM
-    let audioCtx = null;
-
-    function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-    }
+    const jumpAudio = new Audio('jump.mp3');
+    const backAudio = new Audio('back.mp3');
 
     function playSound(type) {
       try {
@@ -548,28 +540,14 @@
         }
 
         if (type === 'back') {
-          const backAudio = new Audio('back.mp3');
+          backAudio.currentTime = 0;
           backAudio.play().catch(e => console.log("Audio play error:", e));
           return;
         }
 
-        initAudio();
-        const now = audioCtx.currentTime;
-
         if (type === 'jump') {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(350, now);
-          osc.frequency.exponentialRampToValueAtTime(800, now + 0.12);
-          
-          gain.gain.setValueAtTime(0.35, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
-          
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start(now);
-          osc.stop(now + 0.12);
+          jumpAudio.currentTime = 0;
+          jumpAudio.play().catch(e => console.log("Audio play error:", e));
         }
       } catch (e) {
         console.log("Audio play deferred or unsupported", e);
