@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <title>Bunny Garden Reward Race - Grade Two</title>
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background: url('background.jpeg') center center / cover no-repeat #8ee4af;
+      display: flex;
+      flex-direction: column;
+      padding: env(safe-area-inset-top, 6px) env(safe-area-inset-right, 8px) env(safe-area-inset-bottom, 8px) env(safe-area-inset-left, 8px);
+      gap: 6px;
+      position: relative;
+    }
+
+    body::before {
+      content: "🌸  🌼  ✨  🌸  🌼  ✨  🌸";
+      position: absolute;
+      top: 2px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.85rem;
+      opacity: 0.65;
+      pointer-events: none;
+    }
+
+    /* Top Bar Header - Centered */
+    .top-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      flex-shrink: 0;
+      gap: 6px;
+      z-index: 2;
+    }
+
+    .title-section h1 {
+      color: #1e4620;
+      font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+      font-weight: 900;
+      text-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    /* Main Layout Wrapper */
+    .main-wrapper {
+      display: flex;
+      flex: 1 1 auto;
+      width: 100%;
+      gap: 8px;
+      min-height: 0;
+      align-items: stretch;
+    }
+
+    /* Garden Board Container */
+    .garden-board {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      flex: 1;
+      background: transparent;
+      padding: 2px 0;
+      min-height: 0;
+      gap: 4px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Horizontal Lane Row */
+    .lane-row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-width: 650px;
+      flex: 1;
+      gap: 8px;
+      padding: 4px 6px;
+      border-radius: 14px;
+      background: transparent;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    /* Character Profile Left Box */
+    .character-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: clamp(90px, 14vw, 150px);
+      flex-shrink: 0;
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 10px;
+      transition: transform 0.2s;
+    }
+
+    .character-left.slightly-larger-left {
+      width: clamp(110px, 17vw, 180px);
+    }
+
+    .character-left:hover {
+      transform: scale(1.05);
+    }
+
+    /* Horizontal Path Strip */
+    .steps-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      flex-grow: 1;
+      height: clamp(80px, 11vh, 130px);
+      background: transparent;
+      border-radius: 16px;
+      padding: 0 6px;
+      position: relative;
+      gap: clamp(2px, 0.6vw, 8px);
+    }
+
+    .steps-row.slightly-larger-row {
+      height: clamp(95px, 13vh, 150px);
+    }
+
+    /* Individual Step Dots Container */
+    .dot-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: clamp(14px, 2vw, 28px);
+      height: clamp(14px, 2vw, 28px);
+      flex-shrink: 0;
+    }
+
+    /* Jump 0 Wrapper on the Left */
+    .start-wrapper {
+      position: relative;
+      width: clamp(14px, 2vw, 28px);
+      height: clamp(14px, 2vw, 28px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Step Dots */
+    .dot {
+      width: clamp(10px, 1.5vw, 20px);
+      height: clamp(10px, 1.5vw, 20px);
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.85);
+      border: 1.5px solid rgba(0, 0, 0, 0.25);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background-color 0.2s ease, transform 0.2s, box-shadow 0.2s;
+      flex-shrink: 0;
+    }
+
+    .dot.active {
+      background-color: #ff9f1c;
+      box-shadow: 0 0 8px rgba(255, 159, 28, 1);
+      border: 1.5px solid #ffffff;
+      transform: scale(1.15);
+    }
+
+    /* Character Photo Sprite Container */
+    .jumping-bunny {
+      position: absolute;
+      pointer-events: auto;
+      cursor: pointer;
+      z-index: 10;
+      transition: transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Base Face Image Styling */
+    .character-avatar {
+      width: clamp(90px, 14vw, 150px);
+      height: clamp(90px, 14vw, 150px);
+      object-fit: contain;
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+      transition: filter 0.2s ease, transform 0.2s ease;
+    }
+
+    /* 3RD FACE SLIGHTLY LARGER (~20% larger than base) */
+    .character-avatar.slightly-larger {
+      width: clamp(110px, 17vw, 180px);
+      height: clamp(110px, 17vw, 180px);
+      filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.4));
+    }
+
+    .jumping-bunny.selected .character-avatar {
+      filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.95)) drop-shadow(0 6px 12px rgba(0,0,0,0.45));
+      transform: scale(1.08);
+    }
+
+    /* Hop Keyframe Animation */
+    .jumping-bunny.hop {
+      animation: bunnyHop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes bunnyHop {
+      0% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.2) rotate(-8deg); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    /* Right End Gift Target */
+    .gift-end {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1;
+      flex-shrink: 0;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+      padding-left: 2px;
+    }
+
+    /* Side Control Panel - Fully Transparent */
+    .controls-side {
+      width: clamp(140px, 18vw, 200px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      z-index: 2;
+      background: transparent;
+      padding: 10px;
+      border-radius: 0;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: none;
+      box-shadow: none;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+
+    /* CIRCULAR Action Buttons */
+    .btn-action {
+      width: clamp(60px, 7.5vw, 85px);
+      height: clamp(60px, 7.5vw, 85px);
+      border-radius: 50%;
+      font-size: clamp(1.4rem, 2.2vw, 2rem);
+      font-weight: 900;
+      padding: 0;
+      border: none;
+      cursor: pointer;
+      color: white;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+      transition: transform 0.1s, filter 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .btn-action:active { transform: scale(0.92); }
+
+    .btn-q1 { background: linear-gradient(135deg, #2ec4b6, #1b8a80); }
+    .btn-q2 { background: linear-gradient(135deg, #3a86ff, #1d5ec4); }
+    .btn-q3 { background: linear-gradient(135deg, #8338ec, #5814b8); }
+    
+    /* Transparent Angry Face Button with Larger Icon */
+    .btn-angry {
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    .btn-angry img {
+      width: 120%;
+      height: 120%;
+      object-fit: contain;
+      pointer-events: none;
+      display: block;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+      transition: transform 0.1s ease;
+    }
+
+    .btn-angry:active img {
+      transform: scale(0.92);
+    }
+
+    /* Small Reset Bar at Bottom */
+    .reset-bar {
+      display: flex;
+      flex-direction: row;
+      gap: 6px;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .btn-reset { 
+      flex: 1;
+      background-color: rgba(255, 255, 255, 0.85); 
+      color: #333; 
+      font-weight: 700;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15); 
+      font-size: clamp(0.65rem, 0.8vw, 0.75rem);
+      padding: 6px 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      cursor: pointer;
+      text-align: center;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-reset:active { transform: scale(0.95); }
+
+    /* Win Celebration Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: rgba(255, 255, 255, 0.95);
+      width: 90%;
+      max-width: 360px;
+      padding: 24px 20px;
+      border-radius: 28px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform: scale(0.7);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    /* Big Gift Styling */
+    .big-gift-icon {
+      font-size: clamp(75px, 14vw, 110px);
+      line-height: 1;
+      margin-bottom: -10px;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
+      animation: floatGift 2s infinite ease-in-out;
+    }
+
+    @keyframes floatGift {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(4deg); }
+    }
+
+    /* Big Face Styling */
+    .big-winner-face {
+      width: clamp(140px, 26vw, 210px);
+      height: clamp(140px, 26vw, 210px);
+      object-fit: contain;
+      margin: 10px 0 20px 0;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.25));
+    }
+
+    /* Small "Again" Button */
+    .btn-again {
+      width: auto;
+      min-width: 110px;
+      padding: 8px 20px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      background: #2ec4b6;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(46, 196, 182, 0.4);
+      cursor: pointer;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    /* Confirmation Modals for Reset Buttons */
+    .confirm-card {
+      padding: 20px 16px;
+      text-align: center;
+    }
+
+    .confirm-title { font-size: 1.1rem; font-weight: 800; color: #2c3e50; margin-bottom: 6px; }
+    .confirm-message { font-size: 0.85rem; color: #555; margin-bottom: 16px; line-height: 1.3; }
+    .confirm-actions { display: flex; gap: 8px; width: 100%; }
+
+    .modal-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .modal-btn-secondary { background: #e0e0e0; color: #555; }
+    .modal-btn-danger { background: #e74c3c; color: white; }
+
+    /* Portrait Phone Responsive Media Query */
+    @media (max-width: 600px) and (orientation: portrait) {
+      .main-wrapper {
+        flex-direction: column;
+      }
+
+      .lane-row {
+        min-width: 100%;
+      }
+
+      .controls-side {
+        width: 100%;
+        flex-direction: column;
+        padding: 8px 12px;
+      }
+
+      .btn-group {
+        flex-direction: row;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+      }
+
+      .reset-bar {
+        width: 100%;
+        margin-top: 2px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar Header -->
+  <div class="top-bar">
+    <div class="title-section">
+      <h1>Grade Two</h1>
+    </div>
+  </div>
+
+  <!-- Main Section -->
+  <div class="main-wrapper">
+    
+    <!-- Garden Board Area -->
+    <div class="garden-board" id="board"></div>
+
+    <!-- Side Control Panel -->
+    <div class="controls-side">
+      <div class="btn-group">
+        <button class="btn-action btn-q1" onclick="moveStep(1)">+1</button>
+        <button class="btn-action btn-q2" onclick="moveStep(2)">+2</button>
+        <button class="btn-action btn-q3" onclick="moveStep(3)">+3</button>
+        <button class="btn-action btn-angry" onclick="moveStep(-1)">
+          <img src="angry.png" alt="Angry">
+        </button>
+      </div>
+      
+      <div class="reset-bar">
+        <button class="btn-reset" onclick="promptResetSelected()">Reset</button>
+        <button class="btn-reset" onclick="promptResetAll()">Reset All</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-card" id="modalCard"></div>
+  </div>
+
+  <script>
+    const totalSteps = 20;
+
+    // AUDIO SYSTEM
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      try {
+        if (type === 'win') {
+          const winAudio = new Audio('win.mp3');
+          winAudio.play().catch(e => console.log("Audio play error:", e));
+          return;
+        }
+
+        if (type === 'back') {
+          const backAudio = new Audio('back.mp3');
+          backAudio.play().catch(e => console.log("Audio play error:", e));
+          return;
+        }
+
+        initAudio();
+        const now = audioCtx.currentTime;
+
+        if (type === 'jump') {
+          // Grade 1 Jump Sound
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(350, now);
+          osc.frequency.exponentialRampToValueAtTime(800, now + 0.12);
+          
+          gain.gain.setValueAtTime(0.35, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+          
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        }
+      } catch (e) {
+        console.log("Audio play deferred or unsupported", e);
+      }
+    }
+
+    const students = [
+      { id: 0, name: "Character 1", icon: "face1.png" },
+      { id: 1, name: "Character 2", icon: "face2.png" },
+      { id: 2, name: "Character 3", icon: "face3.png" },
+      { id: 3, name: "Character 4", icon: "face4.png" }
+    ];
+
+    let selectedIndex = 0;
+    let progress = JSON.parse(localStorage.getItem('studentProgress_g2')) || [0, 0, 0, 0];
+
+    function renderBoard(animateHopIndex = -1) {
+      const boardElement = document.getElementById('board');
+      boardElement.innerHTML = '';
+
+      students.forEach((student, index) => {
+        const isThirdFace = index === 2;
+        const laneRow = document.createElement('div');
+        laneRow.className = `lane-row ${selectedIndex === index ? 'selected' : ''}`;
+
+        // Left Container for Jump 0
+        const charLeft = document.createElement('div');
+        charLeft.className = `character-left ${isThirdFace ? 'slightly-larger-left' : ''}`;
+        charLeft.onclick = () => selectStudent(index);
+
+        const startDotWrapper = document.createElement('div');
+        startDotWrapper.className = 'start-wrapper';
+
+        charLeft.appendChild(startDotWrapper);
+
+        // Horizontal Step Dots Path Container
+        const stepsRow = document.createElement('div');
+        stepsRow.className = `steps-row ${isThirdFace ? 'slightly-larger-row' : ''}`;
+
+        // Jumps 1 to 20 Dot Wrappers
+        for (let i = 1; i <= totalSteps; i++) {
+          const dotWrapper = document.createElement('div');
+          dotWrapper.className = 'dot-wrapper';
+
+          const dot = document.createElement('div');
+          const isActive = i <= progress[index];
+          dot.className = `dot ${isActive ? 'active' : ''}`;
+
+          dotWrapper.appendChild(dot);
+          stepsRow.appendChild(dotWrapper);
+        }
+
+        // Create & position the Jumping Character Photo
+        const bunny = document.createElement('div');
+        const isSelected = selectedIndex === index;
+        bunny.className = `jumping-bunny ${isSelected ? 'selected' : ''} ${animateHopIndex === index ? 'hop' : ''}`;
+        
+        // Face Image Element
+        const img = document.createElement('img');
+        img.src = student.icon;
+        img.alt = student.name;
+        img.className = `character-avatar ${isThirdFace ? 'slightly-larger' : ''}`;
+        bunny.appendChild(img);
+
+        bunny.onclick = (e) => {
+          e.stopPropagation();
+          selectStudent(index);
+        };
+
+        // Attach character badge to jump 0 (left slot) or jump 1-20 dots
+        const currentStepIndex = progress[index];
+        if (currentStepIndex === 0) {
+          startDotWrapper.appendChild(bunny);
+        } else {
+          const targetWrapper = stepsRow.children[currentStepIndex - 1];
+          targetWrapper.appendChild(bunny);
+        }
+
+        // Target Gift Icon on Right End
+        const giftEnd = document.createElement('div');
+        giftEnd.className = 'gift-end';
+        giftEnd.innerText = progress[index] === totalSteps ? '🎁✨' : '🎁';
+
+        laneRow.appendChild(charLeft);
+        laneRow.appendChild(stepsRow);
+        laneRow.appendChild(giftEnd);
+
+        boardElement.appendChild(laneRow);
+      });
+    }
+
+    function selectStudent(index) {
+      selectedIndex = index;
+      renderBoard();
+    }
+
+    function moveStep(val) {
+      let currentVal = progress[selectedIndex];
+      let newVal = Math.min(Math.max(currentVal + val, 0), totalSteps);
+
+      if (newVal !== currentVal) {
+        progress[selectedIndex] = newVal;
+        localStorage.setItem('studentProgress_g2', JSON.stringify(progress));
+
+        // Play Movement Sound Effect
+        if (val < 0) {
+          playSound('back');
+        } else {
+          playSound('jump');
+        }
+
+        // Trigger hop animation on movement
+        renderBoard(selectedIndex);
+
+        // Play win.mp3 and show modal on reaching step 20
+        if (newVal === totalSteps) {
+          setTimeout(() => {
+            playSound('win');
+            showWinModal(students[selectedIndex]);
+          }, 350);
+        }
+      }
+    }
+
+    function showWinModal(student) {
+      const card = document.getElementById('modalCard');
+      card.className = "modal-card";
+      card.innerHTML = `
+        <div class="big-gift-icon">🎁</div>
+        <img src="${student.icon}" alt="${student.name}" class="big-winner-face">
+        <div class="modal-actions">
+          <button class="btn-again" onclick="resetWinner()">Again</button>
+        </div>
+      `;
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function resetWinner() {
+      progress[selectedIndex] = 0;
+      localStorage.setItem('studentProgress_g2', JSON.stringify(progress));
+      renderBoard();
+      closeModal();
+    }
+
+    function promptResetSelected() {
+      const current = students[selectedIndex];
+      const card = document.getElementById('modalCard');
+      card.className = "modal-card confirm-card";
+      card.innerHTML = `
+        <div style="font-size:32px; margin-bottom:4px;">🔄</div>
+        <div class="confirm-title">Reset Face?</div>
+        <div class="confirm-message">Reset <b>${current.name}</b> back to Jump 0?</div>
+        <div class="confirm-actions">
+          <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Cancel</button>
+          <button class="modal-btn modal-btn-danger" onclick="confirmResetSelected()">Reset</button>
+        </div>
+      `;
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function confirmResetSelected() {
+      progress[selectedIndex] = 0;
+      localStorage.setItem('studentProgress_g2', JSON.stringify(progress));
+      renderBoard();
+      closeModal();
+    }
+
+    function promptResetAll() {
+      const card = document.getElementById('modalCard');
+      card.className = "modal-card confirm-card";
+      card.innerHTML = `
+        <div style="font-size:32px; margin-bottom:4px;">⚠️</div>
+        <div class="confirm-title">Reset All Faces?</div>
+        <div class="confirm-message">Are you sure you want to reset <b>ALL</b> characters back to Jump 0?</div>
+        <div class="confirm-actions">
+          <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Cancel</button>
+          <button class="modal-btn modal-btn-danger" onclick="confirmResetAll()">Reset All</button>
+        </div>
+      `;
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function confirmResetAll() {
+      progress = [0, 0, 0, 0];
+      localStorage.setItem('studentProgress_g2', JSON.stringify(progress));
+      renderBoard();
+      closeModal();
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    renderBoard();
+  </script>
+</body>
+</html>
